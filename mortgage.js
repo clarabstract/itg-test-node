@@ -2,13 +2,18 @@ exports.perPeriodInterestRate = (anualRate, paymentsPerYear, compoundPeriod) => 
 	return Math.pow(1.0 + (anualRate / compoundPeriod), compoundPeriod / paymentsPerYear) - 1.0;
 };
 
+const interestTerm = (periods, interest) => {
+	return (interest * Math.pow(1.0 + interest, periods))
+			/ ( Math.pow(1.0 + interest, periods) - 1.0 );
+}
+
 exports.periodPayment = (principal, periods, interest) => {
-	return principal
-		* (
-			(interest * Math.pow(1.0 + interest, periods))
-			/ ( Math.pow(1.0 + interest, periods) - 1.0 )
-		);
+	return principal * interestTerm(periods, interest);
 };
+
+exports.principalForPayment = (payment, periods, interest) => {
+	return payment / interestTerm(periods, interest);
+}
 
 const LOW_DOWNPAYMENT_THRESHOLD = 500000;
 const LOW_DOWNPAYMENT_PERCENT = 0.05;

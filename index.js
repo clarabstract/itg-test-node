@@ -11,6 +11,7 @@ const {
 	getPaymentsPerYear,
 	periodPayment,
 	perPeriodInterestRate,
+	principalForPayment,
 	validateAmortizationPeriod,
 	validateDownPayment,
 	validatePaymentSchedule,
@@ -45,13 +46,49 @@ server([
 	);
 	return status(200).json({
 		paymentPerPeriod,
-		paymentsPerYear,
-		periodRate,
-		askingPrice,
-		INTEREST_RATE,
-		paymentSchedule,
-		amortizationPeriod,
+		info: {
+			paymentsPerYear,
+			periodRate,
+			askingPrice,
+			INTEREST_RATE,
+			paymentSchedule,
+			amortizationPeriod,
+		},
 	});
+  }),
+  get('/mortgage-amount', ctx => {
+  	let { paymentAmount, downPayment, paymentSchedule, amortizationPeriod } = ctx.query;
+  	paymentAmount = parseFloat(paymentAmount)
+  	downPayment = parseInt(downPayment)
+  	amortizationPeriod = parseInt(amortizationPeriod)
+  	const errors = [];
+	validatePaymentSchedule(errors, paymentSchedule);
+	validateAmortizationPeriod(errors, amortizationPeriod);
+  	if (errors.length > 0) {
+  		return status(422).json({errors},);
+  	}
+  	const paymentsPerYear = getPaymentsPerYear(paymentSchedule);
+  	const periodRate = perPeriodInterestRate(
+  		INTEREST_RATE,
+  		paymentsPerYear,
+  		2,
+	);
+	const maximumMortgage = principalForPayment(
+		paymentAmount,
+		paymentsPerYear * amortizationPeriod,
+		periodRate
+	);
+	return status(200).json({
+		maximumMortgage,
+		info: {
+			paymentsPerYear,
+			periodRate,
+			paymentAmount,
+			INTEREST_RATE,
+			paymentSchedule,
+			amortizationPeriod,
+		},
+	})
   }),
   error(ctx => status(500).json({error: ctx.error.message}))
 ]);

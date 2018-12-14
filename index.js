@@ -6,7 +6,7 @@ const { get, error } = require('server/router');
 // quickly here!
 const generic = require('server/router/generic');
 const { status } = require('server/reply');
-
+const { getInterest, updateInterest }  = require('./interestStore');
 const {
 	getPaymentsPerYear,
 	periodPayment,
@@ -18,9 +18,7 @@ const {
 
 } = require('./mortgage');
 
-const INTEREST_RATE = 0.05;
-
-server([
+server({security: {csrf: false}}, [
   get('/payment-amount', ctx => {
   	let { askingPrice, downPayment, paymentSchedule, amortizationPeriod } = ctx.query;
   	askingPrice = parseFloat(askingPrice)
@@ -33,9 +31,10 @@ server([
   	if (errors.length > 0) {
   		return status(422).json({errors},);
   	}
+  	const interestRate = getInterest();
   	const paymentsPerYear = getPaymentsPerYear(paymentSchedule);
   	const periodRate = perPeriodInterestRate(
-  		INTEREST_RATE,
+  		interestRate,
   		paymentsPerYear,
   		2,
 	);
@@ -50,7 +49,7 @@ server([
 			paymentsPerYear,
 			periodRate,
 			askingPrice,
-			INTEREST_RATE,
+			interestRate,
 			paymentSchedule,
 			amortizationPeriod,
 		},
@@ -67,9 +66,10 @@ server([
   	if (errors.length > 0) {
   		return status(422).json({errors},);
   	}
+  	const interestRate = getInterest();
   	const paymentsPerYear = getPaymentsPerYear(paymentSchedule);
   	const periodRate = perPeriodInterestRate(
-  		INTEREST_RATE,
+  		getInterest(),
   		paymentsPerYear,
   		2,
 	);
@@ -84,11 +84,18 @@ server([
 			paymentsPerYear,
 			periodRate,
 			paymentAmount,
-			INTEREST_RATE,
+			interestRate,
 			paymentSchedule,
 			amortizationPeriod,
 		},
 	})
+  }),
+  generic('PATCH', '/interest-rate', ctx => {
+  	const newInterestRate = ctx.data.interestRate;
+  	const oldInterestRate = getInterest();
+  	updateInterest(newInterestRate);
+
+  	return status(200).json({newInterestRate, oldInterestRate});
   }),
   error(ctx => status(500).json({error: ctx.error.message}))
 ]);

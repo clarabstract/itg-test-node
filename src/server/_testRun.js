@@ -1,6 +1,8 @@
 /*
 server.js' test utils are not ready for public use yet. The author recommends "vendoring" the internal
 test code for now if we really must (and we really must).
+
+It was also modified to support the PATCH method.
 */
 
 // Port - generate a random valid port number that has not been used yet
@@ -157,6 +159,7 @@ module.exports = function (...middle) {
         post: generic('POST'),
         put: generic('PUT'),
         del: generic('DELETE'),
+        patch: generic('PATCH'),
         ctx: instance
       };
       await cb(api);
@@ -173,6 +176,7 @@ module.exports = function (...middle) {
   this.post = (url, options) => launch('POST', url, options);
   this.put = (url, options) => launch('PUT', url, options);
   this.del = (url, options) => launch('DELETE', url, options);
+  this.patch = (url, options) => launch('PATCH', url, options);
   return this;
 };
 

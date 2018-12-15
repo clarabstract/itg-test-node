@@ -9,6 +9,7 @@ const {
 	validateAmortizationPeriod,
 	validateDownPayment,
 	validateLocation,
+	validatePaymentAmount,
 	validatePaymentSchedule,
 
 } = require('../mortgage');
@@ -20,6 +21,7 @@ module.exports = get('/mortgage-amount', ctx => {
 	amortizationPeriod = parseInt(amortizationPeriod);
 	location = location === undefined ? 'us' : location;
 	const errors = [];
+	validatePaymentAmount(errors, paymentAmount);
 	validatePaymentSchedule(errors, paymentSchedule);
 	validateAmortizationPeriod(errors, amortizationPeriod);
 	validateLocation(errors, location);
@@ -33,11 +35,14 @@ module.exports = get('/mortgage-amount', ctx => {
 		paymentsPerYear,
 		getCompoundPeriod(location)
 	);
-	const maximumMortgage = principalForPayment(
+	let maximumMortgage = principalForPayment(
 		paymentAmount,
 		paymentsPerYear * amortizationPeriod,
 		periodRate
 	);
+	if (!isNaN(downPayment)) {
+		maximumMortgage += downPayment;
+	}
 	return status(200).json({
 		maximumMortgage,
 		info: {

@@ -11,5 +11,8 @@ server({security: {csrf: false}}, [
 	paymentAmountRoute,
 	mortgageAmountRoute,
 	interestRateRoute,
-	error(ctx => status(500).json({error: ctx.error.message})),
+	error(ctx => status(500).json({
+		error: ctx.error.message,
+		stack: ctx.error.stack,
+	})),
 ]);

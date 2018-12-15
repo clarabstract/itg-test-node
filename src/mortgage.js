@@ -1,4 +1,5 @@
 const { inspect } = require('util');
+
 exports.validateAskingPrice = (errors, askingPrice) => {
 	if (typeof askingPrice !== 'number' || isNaN(askingPrice)) {
 		errors.push({
@@ -8,6 +9,17 @@ exports.validateAskingPrice = (errors, askingPrice) => {
 		});
 	}
 };
+
+exports.validatePaymentAmount = (errors, paymentAmount) => {
+	if (typeof paymentAmount !== 'number' || isNaN(paymentAmount)) {
+		errors.push({
+			param: 'paymentAmount',
+			code: 'MISSING',
+			message: `A payment amount must be provided - receieved: ${inspect(paymentAmount)}`,
+		});
+	}
+};
+
 
 exports.perPeriodInterestRate = (anualRate, paymentsPerYear, compoundPeriod) => {
 	return Math.pow(1.0 + (anualRate / compoundPeriod), compoundPeriod / paymentsPerYear) - 1.0;

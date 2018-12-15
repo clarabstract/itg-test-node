@@ -8,10 +8,12 @@
   "license": "MIT",
   "scripts": {
     "start": "node index.js",
-    "test": "jest"
+    "test": "jest",
+    "test:cov": "jest --coverage"
   },
   "jest": {
-    "setupTestFrameworkScriptFile": "jest-extended"
+    "setupTestFrameworkScriptFile": "jest-extended",
+    "coveragePathIgnorePatterns": ["node_modules", "_testRun.js"]
   },
   "dependencies": {
     "server": "^1.0.18"

@@ -1,6 +1,9 @@
 const { stringify } = require('querystring');
 const run = require('./_testRun');
 const route = require('./payment-amount');
+const interestStore = require('../interestStore');
+// this keeps tests from seeing each-other's interest rate files:
+interestStore.INTEREST_FILE_PATH = './interest.payment-test.json';
 
 const VALID_PARAMS = {
 	askingPrice: 750000,
@@ -81,8 +84,18 @@ describe('GET /payment-amount', () => {
 			validRange: {min: 5, max: 25},
 		}));
 	})
+		it('should require a valid location (if one is given)', async () => {
+		const response = await run(route).get(validRequestPath({location: 'ro'}));
+		expect(response.statusCode).toEqual(422);
+		expect(response.body).toContainKey('errors');
+		expect(response.body.errors).toContainValue(expect.objectContaining({
+			param: 'location',
+			code: 'INVALID_OPTION',
+			validOptions: ['us', 'ca'],
+		}));
+	})
 	it('should calculate the correct monthly payment for a US mortgage', async () => {
-		const response = await run(route).get(validRequestPath());
+		const response = await run(route).get(validRequestPath({location: 'us'}));
 		expect(response.statusCode).toEqual(200);
 		expect(response.body.info.mortgageInsuranceAdded).toEqual(EXPECTED_MORTGAGE_INSURANCE_COST);
 		expect(response.body).toEqual(expect.objectContaining({

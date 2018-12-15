@@ -9,7 +9,9 @@
   "scripts": {
     "start": "node index.js",
     "test": "jest",
-    "test:cov": "jest --coverage"
+    "test:cov": "jest --coverage",
+    "lint": "eslint --cache --ignore-pattern '_testRun.js' *.js src",
+    "lint:fix": "eslint --cache --ignore-pattern '_testRun.js' --fix *.js src"
   },
   "jest": {
     "setupTestFrameworkScriptFile": "jest-extended",

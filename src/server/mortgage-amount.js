@@ -7,7 +7,6 @@ const {
 	perPeriodInterestRate,
 	principalForPayment,
 	validateAmortizationPeriod,
-	validateDownPayment,
 	validateLocation,
 	validatePaymentAmount,
 	validatePaymentSchedule,

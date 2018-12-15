@@ -10,7 +10,7 @@ const VALID_PARAMS = {
 	downPayment: 50000,
 	paymentSchedule: 'monthly',
 	amortizationPeriod: 10,
-}
+};
 // 50,000 / 75,000 = 6.66%, so using 3.15% insurance cost on principal:
 const EXPECTED_MORTGAGE_INSURANCE_COST = (750000 - 50000) * 0.0315;
 // Obtained from https://www.mortgagecalculator.org/ using $772,050 (asking price + insurance) as the principal
@@ -19,7 +19,7 @@ const EXPECTED_US_MORTGAGE_PAYMENT = 6806.76;
 const EXPECTED_CA_MORTGAGE_PAYMENT = 6802.52;
 const validRequestPath = (replacingParams = {}) =>  {
 	return `/payment-amount?${stringify({...VALID_PARAMS, ...replacingParams})}`;
-}
+};
 
 describe('GET /payment-amount', () => {
 	it.each(['askingPrice', 'downPayment', 'paymentSchedule', 'amortizationPeriod'])(
@@ -33,7 +33,7 @@ describe('GET /payment-amount', () => {
 				code: 'MISSING',
 			}));
 		}
-	)
+	);
 	it('should require the correct minimum down payment below 500K', async () => {
 		const response = await run(route).get(validRequestPath({askingPrice: 100000, downPayment: 4999}));
 		expect(response.statusCode).toEqual(422);
@@ -43,7 +43,7 @@ describe('GET /payment-amount', () => {
 			code: 'TOO_LOW',
 			minValue: 5000,
 		}));
-	})
+	});
 	it('should require the correct minimum down payment above 500K', async () => {
 		const response = await run(route).get(validRequestPath({askingPrice: 1000000, downPayment: 74999}));
 		expect(response.statusCode).toEqual(422);
@@ -53,7 +53,7 @@ describe('GET /payment-amount', () => {
 			code: 'TOO_LOW',
 			minValue: 75000,
 		}));
-	})
+	});
 	it('should require a valid payment schedule', async () => {
 		const response = await run(route).get(validRequestPath({paymentSchedule: 'yearly'}));
 		expect(response.statusCode).toEqual(422);
@@ -63,7 +63,7 @@ describe('GET /payment-amount', () => {
 			code: 'INVALID_OPTION',
 			validOptions: ['weekly', 'biweekly', 'monthly'],
 		}));
-	})
+	});
 	it('should require an amortization period of at least 5 years', async () => {
 		const response = await run(route).get(validRequestPath({amortizationPeriod: 4}));
 		expect(response.statusCode).toEqual(422);
@@ -73,7 +73,7 @@ describe('GET /payment-amount', () => {
 			code: 'OUTSIDE_RANGE',
 			validRange: {min: 5, max: 25},
 		}));
-	})
+	});
 	it('should require an amortization period of no more than 25 years', async () => {
 		const response = await run(route).get(validRequestPath({amortizationPeriod: 26}));
 		expect(response.statusCode).toEqual(422);
@@ -83,8 +83,8 @@ describe('GET /payment-amount', () => {
 			code: 'OUTSIDE_RANGE',
 			validRange: {min: 5, max: 25},
 		}));
-	})
-		it('should require a valid location (if one is given)', async () => {
+	});
+	it('should require a valid location (if one is given)', async () => {
 		const response = await run(route).get(validRequestPath({location: 'ro'}));
 		expect(response.statusCode).toEqual(422);
 		expect(response.body).toContainKey('errors');
@@ -93,7 +93,7 @@ describe('GET /payment-amount', () => {
 			code: 'INVALID_OPTION',
 			validOptions: ['us', 'ca'],
 		}));
-	})
+	});
 	it('should calculate the correct monthly payment for a US mortgage', async () => {
 		const response = await run(route).get(validRequestPath({location: 'us'}));
 		expect(response.statusCode).toEqual(200);
@@ -105,7 +105,7 @@ describe('GET /payment-amount', () => {
 				EXPECTED_US_MORTGAGE_PAYMENT + 0.01,
 			),
 		}));
-	})
+	});
 	it('should calculate the correct monthly payment for a CA mortgage', async () => {
 		const response = await run(route).get(validRequestPath({location: 'ca'}));
 		expect(response.statusCode).toEqual(200);
@@ -117,5 +117,5 @@ describe('GET /payment-amount', () => {
 				EXPECTED_CA_MORTGAGE_PAYMENT + 0.01,
 			),
 		}));
-	})
+	});
 });

@@ -152,9 +152,9 @@ const getInsuranceRateForDownPaymentPercent = (downPaymentPercent) => {
 		}
 	}
 	throw new Error('Down payment is too low to calculate mortgage insurance rate');
-}
+};
 exports.mortgageInsurance = (askingPrice, downPayment) => {
-	downPaymentPercent = downPayment / askingPrice;
-	insuranceCostPercent = getInsuranceRateForDownPaymentPercent(downPaymentPercent);
+	const downPaymentPercent = downPayment / askingPrice;
+	const insuranceCostPercent = getInsuranceRateForDownPaymentPercent(downPaymentPercent);
 	return (askingPrice - downPayment) * insuranceCostPercent;
-}
+};

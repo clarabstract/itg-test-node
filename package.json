@@ -17,6 +17,7 @@
     "setupTestFrameworkScriptFile": "jest-extended",
     "coveragePathIgnorePatterns": ["node_modules", "_testRun.js"]
   },
+  "engines" : { "node" : ">=8.10" },
   "dependencies": {
     "server": "^1.0.18"
   },

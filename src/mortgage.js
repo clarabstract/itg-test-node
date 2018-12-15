@@ -42,7 +42,7 @@ const LOW_DOWNPAYMENT_THRESHOLD = 500000;
 const LOW_DOWNPAYMENT_PERCENT = 0.05;
 const HIGH_DOWNPAYMENT_PERCENT = 0.1;
 
-const minDownPayment = (askingPrice) => {
+const minDownPayment = exports.minDownPayment = (askingPrice) => {
 	let minDown = Math.min(LOW_DOWNPAYMENT_THRESHOLD, askingPrice) * LOW_DOWNPAYMENT_PERCENT;
 	const highDownpaymentAmount = askingPrice - LOW_DOWNPAYMENT_THRESHOLD;
 	if (highDownpaymentAmount > 0) {
